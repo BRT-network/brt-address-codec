@@ -1,7 +1,7 @@
 {
-  "name": "ripple-address-codec",
-  "version": "4.1.1",
-  "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
+  "name": "brt-address-codec",
+  "version": "0.1.0",
+  "description": "encodes/decodes base58 encoded BRT Ledger identifiers",
   "files": [
     "dist/*",
     "build/*"
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ripple/ripple-address-codec.git"
+    "url": "git://github.com/BRT-network/brt-address-codec.git"
   },
   "prepublish": "tsc",
   "prepublishOnly": "tslint -p ./ && jest",

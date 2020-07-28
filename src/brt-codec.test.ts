@@ -1,4 +1,4 @@
-import * as api from './xrp-codec'
+import * as api from './brt-codec'
 
 function toHex(bytes: Buffer) {
   return Buffer.from(bytes).toString('hex').toUpperCase()
@@ -27,46 +27,23 @@ function makeEncodeDecodeTest(encoder: Function, decoder: Function, base58: stri
   })
 }
 
-makeEncodeDecodeTest(api.encodeAccountID, api.decodeAccountID, 'rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN',
-  'BA8E78626EE42C41B46D46C3048DF3A1C3C87072')
+makeEncodeDecodeTest(api.encodeAccountID, api.decodeAccountID, '13cHUa7Zw3yQKW5EdBefC11NcWXcw7eMUM',
+  '1C9C902BD2408F10552509CAD5966C023084C756')
 
 makeEncodeDecodeTest(api.encodeNodePublic, api.decodeNodePublic,
-  'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',
+  '6BR3QWyUgtndBiYEWMLTvr37dvgScVctTUCagtCQUx79aZXuPySA',
   '0388E5BA87A000CB807240DF8C848EB0B5FFA5C8E5A521BC8E105C0F0A44217828')
 
   makeEncodeDecodeTest(api.encodeAccountPublic, api.decodeAccountPublic,
     'aB44YfzW24VDEJQ2UuLPV2PvqcPCSoLnL7y5M1EzhdW4LnK5xMS3',
     '023693F15967AE357D0327974AD46FE3C127113B1110D6044FD41E723689F81CC6')
 
-test('can decode arbitrary seeds', function() {
-  const decoded = api.decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
-  expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
-  expect(decoded.type).toBe('ed25519')
-
-  const decoded2 = api.decodeSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
-  expect(toHex(decoded2.bytes)).toBe('CF2DE378FBDD7E2EE87D486DFB5A7BFF')
-  expect(decoded2.type).toBe('secp256k1')
-})
-
-test('can pass a type as second arg to encodeSeed', function() {
-  const edSeed = 'sEdTM1uX8pu2do5XvTnutH6HsouMaM2'
-  const decoded = api.decodeSeed(edSeed)
-  const type = 'ed25519'
-  expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
-  expect(decoded.type).toBe(type)
-  expect(api.encodeSeed(decoded.bytes, type)).toBe(edSeed)
-})
-
 test('isValidClassicAddress - secp256k1 address valid', function() {
-  expect(api.isValidClassicAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1')).toBe(true)
-})
-
-test('isValidClassicAddress - ed25519 address valid', function() {
-  expect(api.isValidClassicAddress('rLUEXYuLiQptky37CqLcm9USQpPiz5rkpD')).toBe(true)
+  expect(api.isValidClassicAddress('13cHUa7Zw3yQKW5EdBefC11NcWXcw7eMUM')).toBe(true)
 })
 
 test('isValidClassicAddress - invalid', function() {
-  expect(api.isValidClassicAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw2')).toBe(false)
+  expect(api.isValidClassicAddress('13cHUa7Zw3yQKW5EdBefC11NcWXcw7eMUl')).toBe(false)
 })
 
 test('isValidClassicAddress - empty', function() {
@@ -76,55 +53,34 @@ test('isValidClassicAddress - empty', function() {
 describe('encodeSeed', function() {
 
   it('encodes a secp256k1 seed', function() {
-    const result = api.encodeSeed(Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFF', 'hex'), 'secp256k1')
-    expect(result).toBe('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
+    const result = api.encodeSeed(Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFF', 'hex'))
+    expect(result).toBe('35ai91FpX1Q1Wyx8QUX5eWcAVhd7L')
   })
 
   it('encodes low secp256k1 seed', function() {
-    const result = api.encodeSeed(Buffer.from('00000000000000000000000000000000', 'hex'), 'secp256k1')
-    expect(result).toBe('sp6JS7f14BuwFY8Mw6bTtLKWauoUs')
+    const result = api.encodeSeed(Buffer.from('00000000000000000000000000000000', 'hex'))
+    expect(result).toBe('32hJSU7sNBuApYnMAhbTtLKW6uoC3')
   })
 
   it('encodes high secp256k1 seed', function() {
-    const result = api.encodeSeed(Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'), 'secp256k1')
-    expect(result).toBe('saGwBRReqUNKuWNLpUAq8i8NkXEPN')
-  })
-
-  it('encodes an ed25519 seed', function() {
-    const result = api.encodeSeed(Buffer.from('4C3A1D213FBDFB14C7C28D609469B341', 'hex'), 'ed25519')
-    expect(result).toBe('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
-  })
-
-  it('encodes low ed25519 seed', function() {
-    const result = api.encodeSeed(Buffer.from('00000000000000000000000000000000', 'hex'), 'ed25519')
-    expect(result).toBe('sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE')
-  })
-
-  it('encodes high ed25519 seed', function() {
-    const result = api.encodeSeed(Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'), 'ed25519')
-    expect(result).toBe('sEdV19BLfeQeKdEXyYA4NhjPJe6XBfG')
+    const result = api.encodeSeed(Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'))
+    expect(result).toBe('36GABRReqCEKuWEL2CwqnrnEkXFPE')
   })
 
   test('attempting to encode a seed with less than 16 bytes of entropy throws', function() {
     expect(() => {
-      api.encodeSeed(Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7B', 'hex'), 'secp256k1')
+      api.encodeSeed(Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7B', 'hex'))
     }).toThrow('entropy must have length 16')
   })
 
   test('attempting to encode a seed with more than 16 bytes of entropy throws', function() {
     expect(() => {
-      api.encodeSeed(Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFFFF', 'hex'), 'secp256k1')
+      api.encodeSeed(Buffer.from('4FB52B1382DF48C29A7ACC129842537E', 'hex'))
     }).toThrow('entropy must have length 16')
   })
 })
 
 describe('decodeSeed', function() {
-
-  it('can decode an Ed25519 seed', function() {
-    const decoded = api.decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
-    expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
-    expect(decoded.type).toBe('ed25519')
-  })
 
   it('can decode a secp256k1 seed', function() {
     const decoded = api.decodeSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
